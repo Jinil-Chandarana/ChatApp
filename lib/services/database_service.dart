@@ -21,6 +21,32 @@ class DatabaseService {
     });
   }
 
+  Future addProfileImage(String imgURL) async {
+    return await userCollection.doc(uid).update({
+      "profilePic": imgURL,
+    });
+  }
+
+  Future<String> getProfilePics() async {
+    String profilePics = "";
+
+    try {
+      final QuerySnapshot snapshot = await userCollection.get();
+
+      if (snapshot.docs.isNotEmpty) {
+        profilePics = snapshot.docs
+            .map((doc) => doc.get("profilePic") as String)
+            .where((profilePic) => profilePic != null && profilePic.isNotEmpty)
+            .join(",");
+      }
+    } catch (e) {
+      // Handle any potential errors here
+      print("Error getting profile pictures: $e");
+    }
+
+    return profilePics;
+  }
+
   // getting user data
   Future gettingUserData(String email) async {
     QuerySnapshot snapshot =

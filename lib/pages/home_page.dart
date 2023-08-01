@@ -24,6 +24,9 @@ class _HomePageState extends State<HomePage> {
   Stream? groups;
   bool _isLoading = false;
   String groupName = "";
+  final profilePic =
+      DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
+          .getProfilePics();
 
   @override
   void initState() {
@@ -87,10 +90,27 @@ class _HomePageState extends State<HomePage> {
           child: ListView(
         padding: const EdgeInsets.symmetric(vertical: 50),
         children: <Widget>[
-          Icon(
-            Icons.account_circle,
-            size: 150,
-            color: Colors.grey[700],
+          FutureBuilder<String>(
+            future: profilePic,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError || snapshot.data == null) {
+                // Handle any errors or if profilePic is null
+                // You can display a default image or an icon indicating no image
+                return const CircleAvatar(
+                  backgroundImage: AssetImage("assets/default_profile_pic.png"),
+                  radius: 50,
+                );
+              } else {
+                String profilePicUrl = snapshot.data!;
+
+                return CircleAvatar(
+                  backgroundImage: NetworkImage(profilePicUrl),
+                  radius: 60,
+                );
+              }
+            },
           ),
           const SizedBox(
             height: 15,
@@ -129,7 +149,7 @@ class _HomePageState extends State<HomePage> {
             },
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-            leading: const Icon(Icons.group),
+            leading: const Icon(Icons.person),
             title: const Text(
               "Profile",
               style: TextStyle(color: Colors.black),
