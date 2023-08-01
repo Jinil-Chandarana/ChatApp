@@ -6,5 +6,5 @@ class Constants {
   static String messagingSenderId = '1000643173864';
   static String projectId = 'chatapp-729ce';
 
-  final primaryColor = Color(0xFFee7b64);
+  final primaryColor = const Color(0xFFee7b64);
 }

@@ -1,12 +1,13 @@
-import 'package:chat_app/helper/helper_function.dart';
-import 'package:chat_app/services/database_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
+import '../helper/helper_function.dart';
+import 'database_service.dart';
 
 class AuthService {
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
   // login
-  Future loginUserWithEmailandPassword(String email, String password) async {
+  Future loginWithUserNameandPassword(String email, String password) async {
     try {
       User user = (await firebaseAuth.signInWithEmailAndPassword(
               email: email, password: password))
@@ -16,37 +17,34 @@ class AuthService {
         return true;
       }
     } on FirebaseAuthException catch (e) {
-      print(e);
       return e.message;
     }
   }
 
-  // register user
+  // register
   Future registerUserWithEmailandPassword(
-      String fullname, String email, String password) async {
+      String fullName, String email, String password) async {
     try {
       User user = (await firebaseAuth.createUserWithEmailAndPassword(
               email: email, password: password))
           .user!;
 
       if (user != null) {
-        await DatabaseService(uid: user.uid).savingUserData(fullname, email);
-
+        // call our database service to update the user data.
+        await DatabaseService(uid: user.uid).savingUserData(fullName, email);
         return true;
       }
     } on FirebaseAuthException catch (e) {
-      print(e);
       return e.message;
     }
   }
 
   // signout
-
   Future signOut() async {
     try {
       await HelperFunctions.saveUserLoggedInStatus(false);
-      await HelperFunctions.saveUserNameSF("");
       await HelperFunctions.saveUserEmailSF("");
+      await HelperFunctions.saveUserNameSF("");
       await firebaseAuth.signOut();
     } catch (e) {
       return null;
